@@ -213,7 +213,30 @@ JSONEditor.defaults.editors.string = JSONEditor.AbstractEditor.extend({
         self.refreshValue();
         self.onChange(true);
       });
-      
+
+    this.input
+      .addEventListener('keyup', function (e) {
+
+        // Don't allow changing if this field is a template
+        if (self.schema.template) {
+          this.value = self.value;
+          return;
+        }
+
+        var val = this.value;
+
+        // sanitize value
+        var sanitized = self.sanitize(val);
+        if (val !== sanitized) {
+          this.value = sanitized;
+        }
+
+        self.is_dirty = true;
+
+        self.refreshValue();
+        self.onChange(true);
+      });
+
     if(this.options.input_height) this.input.style.height = this.options.input_height;
     if(this.options.expand_height) {
       this.adjust_height = function(el) {

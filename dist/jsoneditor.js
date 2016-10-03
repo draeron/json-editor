@@ -2083,7 +2083,30 @@ JSONEditor.defaults.editors.string = JSONEditor.AbstractEditor.extend({
         self.refreshValue();
         self.onChange(true);
       });
-      
+
+    this.input
+      .addEventListener('keyup', function (e) {
+
+        // Don't allow changing if this field is a template
+        if (self.schema.template) {
+          this.value = self.value;
+          return;
+        }
+
+        var val = this.value;
+
+        // sanitize value
+        var sanitized = self.sanitize(val);
+        if (val !== sanitized) {
+          this.value = sanitized;
+        }
+
+        self.is_dirty = true;
+
+        self.refreshValue();
+        self.onChange(true);
+      });
+
     if(this.options.input_height) this.input.style.height = this.options.input_height;
     if(this.options.expand_height) {
       this.adjust_height = function(el) {
@@ -2652,8 +2675,8 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
       // Edit JSON modal
       this.editjson_holder = this.theme.getModal();
       this.editjson_textarea = this.theme.getTextareaInput();
-      this.editjson_textarea.style.height = '170px';
-      this.editjson_textarea.style.width = '300px';
+      this.editjson_textarea.style.height = '240px';
+      this.editjson_textarea.style.width = '400px';
       this.editjson_textarea.style.display = 'block';
       this.editjson_save = this.getButton('Save','save','Save');
       this.editjson_save.addEventListener('click',function(e) {
@@ -2674,8 +2697,8 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
       // Manage Properties modal
       this.addproperty_holder = this.theme.getModal();
       this.addproperty_list = document.createElement('div');
-      this.addproperty_list.style.width = '295px';
-      this.addproperty_list.style.maxHeight = '160px';
+      this.addproperty_list.style.width = '340px';
+      this.addproperty_list.style.maxHeight = '260px';
       this.addproperty_list.style.padding = '5px 0';
       this.addproperty_list.style.overflowY = 'auto';
       this.addproperty_list.style.overflowX = 'hidden';
@@ -5579,6 +5602,7 @@ JSONEditor.defaults.editors.multiselect = JSONEditor.AbstractEditor.extend({
       }
 
       this.control = this.theme.getFormControl(this.label, this.input, this.description);
+      this.setupSelect2();
     }
 
     this.container.appendChild(this.control);
@@ -5612,6 +5636,9 @@ JSONEditor.defaults.editors.multiselect = JSONEditor.AbstractEditor.extend({
 
       this.select_options[i][this.input_type === "select"? "selected" : "checked"] = (value.indexOf(i) !== -1);
     }
+
+    if (this.select2)
+      this.select2.select2('val', value);
 
     this.updateValue(value);
     this.onChange();
@@ -6209,11 +6236,22 @@ JSONEditor.AbstractTheme = Class.extend({
       el.appendChild(label);
     }
 
-    for(var i in controls) {
-      if(!controls.hasOwnProperty(i)) continue;
-      controls[i].style.display = 'inline-block';
-      controls[i].style.marginRight = '20px';
-      el.appendChild(controls[i]);
+    var row = document.createElement('div');
+    row.className = 'input-group';
+    el.appendChild(row);
+
+    for (var i in controls) {
+      if (!controls.hasOwnProperty(i)) continue;
+      //controls[i].style.display = 'inline-block';
+
+      var group = document.createElement('div');
+      group.className = 'control-group';
+      group.style.float = 'left';
+
+      //controls[i].style.marginRight = '20px';
+      //controls[i].style.float = 'left';
+      group.appendChild(controls[i]);
+      row.appendChild(group);
     }
 
     if(description) el.appendChild(description);
@@ -6653,7 +6691,7 @@ JSONEditor.defaults.themes.bootstrap3 = JSONEditor.AbstractTheme.extend({
   },
   afterInputReady: function(input) {
     if(input.controlgroup) return;
-    input.controlgroup = this.closest(input,'.form-group');
+    input.controlgroup = this.closest(input,'.input-group');
     if(this.closest(input,'.compact')) {
       input.controlgroup.style.marginBottom = 0;
     }
@@ -6678,20 +6716,23 @@ JSONEditor.defaults.themes.bootstrap3 = JSONEditor.AbstractTheme.extend({
   },
   getFormControl: function(label, input, description) {
     var group = document.createElement('div');
+    group.className += ' input-group';
 
-    if(label && input.type === 'checkbox') {
-      group.className += ' checkbox';
-      label.appendChild(input);
-      label.style.fontSize = '14px';
-      group.style.marginTop = '0';
+    if (label && input.type === 'checkbox') {
+
+      var span = document.createElement('span');
+      span.appendChild(input);
+      span.className += ' input-group-addon';
+
+      label.attribute += 'disabled';
+      label.className += ' form-control';
+
+      group.appendChild(span);
       group.appendChild(label);
-      input.style.position = 'relative';
-      input.style.cssFloat = 'left';
-    } 
-    else {
-      group.className += ' form-group';
-      if(label) {
-        label.className += ' control-label';
+    } else {
+
+      if (label) {
+        label.className += ' input-group-addon';
         group.appendChild(label);
       }
       group.appendChild(input);
@@ -6739,12 +6780,11 @@ JSONEditor.defaults.themes.bootstrap3 = JSONEditor.AbstractTheme.extend({
   addInputError: function(input,text) {
     if(!input.controlgroup) return;
     input.controlgroup.className += ' has-error';
-    if(!input.errmsg) {
-      input.errmsg = document.createElement('p');
-      input.errmsg.className = 'help-block errormsg';
-      input.controlgroup.appendChild(input.errmsg);
-    }
-    else {
+    if (!input.errmsg) {
+      input.errmsg = document.createElement('div');
+      input.errmsg.className = 'alert alert-danger alert-sm';
+      input.controlgroup.parentNode.insertBefore(input.errmsg, input.controlgroup.nextSibling);
+    } else {
       input.errmsg.style.display = '';
     }
 

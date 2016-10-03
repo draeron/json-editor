@@ -10,7 +10,7 @@ JSONEditor.defaults.themes.bootstrap3 = JSONEditor.AbstractTheme.extend({
   },
   afterInputReady: function(input) {
     if(input.controlgroup) return;
-    input.controlgroup = this.closest(input,'.form-group');
+    input.controlgroup = this.closest(input,'.input-group');
     if(this.closest(input,'.compact')) {
       input.controlgroup.style.marginBottom = 0;
     }
@@ -35,20 +35,23 @@ JSONEditor.defaults.themes.bootstrap3 = JSONEditor.AbstractTheme.extend({
   },
   getFormControl: function(label, input, description) {
     var group = document.createElement('div');
+    group.className += ' input-group';
 
-    if(label && input.type === 'checkbox') {
-      group.className += ' checkbox';
-      label.appendChild(input);
-      label.style.fontSize = '14px';
-      group.style.marginTop = '0';
+    if (label && input.type === 'checkbox') {
+
+      var span = document.createElement('span');
+      span.appendChild(input);
+      span.className += ' input-group-addon';
+
+      label.attribute += 'disabled';
+      label.className += ' form-control';
+
+      group.appendChild(span);
       group.appendChild(label);
-      input.style.position = 'relative';
-      input.style.cssFloat = 'left';
-    } 
-    else {
-      group.className += ' form-group';
-      if(label) {
-        label.className += ' control-label';
+    } else {
+
+      if (label) {
+        label.className += ' input-group-addon';
         group.appendChild(label);
       }
       group.appendChild(input);
@@ -96,12 +99,11 @@ JSONEditor.defaults.themes.bootstrap3 = JSONEditor.AbstractTheme.extend({
   addInputError: function(input,text) {
     if(!input.controlgroup) return;
     input.controlgroup.className += ' has-error';
-    if(!input.errmsg) {
-      input.errmsg = document.createElement('p');
-      input.errmsg.className = 'help-block errormsg';
-      input.controlgroup.appendChild(input.errmsg);
-    }
-    else {
+    if (!input.errmsg) {
+      input.errmsg = document.createElement('div');
+      input.errmsg.className = 'alert alert-danger alert-sm';
+      input.controlgroup.parentNode.insertBefore(input.errmsg, input.controlgroup.nextSibling);
+    } else {
       input.errmsg.style.display = '';
     }
 

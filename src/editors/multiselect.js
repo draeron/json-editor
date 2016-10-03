@@ -57,6 +57,7 @@ JSONEditor.defaults.editors.multiselect = JSONEditor.AbstractEditor.extend({
       }
 
       this.control = this.theme.getFormControl(this.label, this.input, this.description);
+      this.setupSelect2();
     }
 
     this.container.appendChild(this.control);
@@ -90,6 +91,9 @@ JSONEditor.defaults.editors.multiselect = JSONEditor.AbstractEditor.extend({
 
       this.select_options[i][this.input_type === "select"? "selected" : "checked"] = (value.indexOf(i) !== -1);
     }
+
+    if (this.select2)
+      this.select2.select2('val', value);
 
     this.updateValue(value);
     this.onChange();

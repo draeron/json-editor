@@ -98,11 +98,22 @@ JSONEditor.AbstractTheme = Class.extend({
       el.appendChild(label);
     }
 
-    for(var i in controls) {
-      if(!controls.hasOwnProperty(i)) continue;
-      controls[i].style.display = 'inline-block';
-      controls[i].style.marginRight = '20px';
-      el.appendChild(controls[i]);
+    var row = document.createElement('div');
+    row.className = 'input-group';
+    el.appendChild(row);
+
+    for (var i in controls) {
+      if (!controls.hasOwnProperty(i)) continue;
+      //controls[i].style.display = 'inline-block';
+
+      var group = document.createElement('div');
+      group.className = 'control-group';
+      group.style.float = 'left';
+
+      //controls[i].style.marginRight = '20px';
+      //controls[i].style.float = 'left';
+      group.appendChild(controls[i]);
+      row.appendChild(group);
     }
 
     if(description) el.appendChild(description);

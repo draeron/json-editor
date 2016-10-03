@@ -311,8 +311,8 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
       // Edit JSON modal
       this.editjson_holder = this.theme.getModal();
       this.editjson_textarea = this.theme.getTextareaInput();
-      this.editjson_textarea.style.height = '170px';
-      this.editjson_textarea.style.width = '300px';
+      this.editjson_textarea.style.height = '240px';
+      this.editjson_textarea.style.width = '400px';
       this.editjson_textarea.style.display = 'block';
       this.editjson_save = this.getButton('Save','save','Save');
       this.editjson_save.addEventListener('click',function(e) {
@@ -333,8 +333,8 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
       // Manage Properties modal
       this.addproperty_holder = this.theme.getModal();
       this.addproperty_list = document.createElement('div');
-      this.addproperty_list.style.width = '295px';
-      this.addproperty_list.style.maxHeight = '160px';
+      this.addproperty_list.style.width = '340px';
+      this.addproperty_list.style.maxHeight = '260px';
       this.addproperty_list.style.padding = '5px 0';
       this.addproperty_list.style.overflowY = 'auto';
       this.addproperty_list.style.overflowX = 'hidden';
